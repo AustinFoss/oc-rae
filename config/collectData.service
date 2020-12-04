@@ -1,0 +1,10 @@
+[Unit]
+Description=Data Collector Process
+
+[Service]
+# Command to execute when the service is started
+ExecStart=/home/pi/environments/oc-rae/bin/python /home/pi/environments/oc-rae/collectData.py
+Restart=always
+
+[Install]
+WantedBy=default.target

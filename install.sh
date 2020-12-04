@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Make the folder where all pictures from the Raspberry Pi  Camera will be stored
+mkdir /home/pi/Pictures
+# Install necessary packages
+apt install python3-venv postgresql python3-pip -y
+# Initialize the working Python virtual environment
+python3 -m venv /home/pi/environments/oc-rae
+
+# Configure the PostgreSQL user
+sudo -u postgres createuser -s pi
+sudo -u postgres createdb pi
+sudo -u pi psql << EOF
+ALTER ROLE pi WITH PASSWORD 'oldsCollege';
+EOF
+
+# Copy Python scripts to the virtual environment
+cp -r /home/pi/oc-rae/scripts/* /home/pi/environments/oc-rae/
+# Copy PostgreSQL configuration files to enable remote access
+cp /home/pi/oc-rae/config/postgresql.conf /etc/postgresql/11/main/
+cp /home/pi/oc-rae/config/pg_hba.conf /etc/postgresql/11/main/
+# Copy config file to enable the Raspberry Pi Camera
+cp /home/pi/oc-rae/config/config.txt /boot/
+
+# Ensure all directories created belong to the user 'pi'
+chown -R pi:pi /home/pi
+
+# Install all required python packages in the virtual environment
+source /home/pi/environments/oc-rae/bin/activate
+pip install -r /home/pi/environments/oc-rae/config/requirements.txt
+deactivate
+
+# Enable the Python script(s) as services the start on reboot and restart after failures
+cp /home/pi/oc-rae/config/collectData.service /etc/systemd/system
+chown root:root /etc/systemd/system/collectData.service
+chmod 644 /etc/systemd/system/collectData.service
+systemctl daemon-reload
+systemctl enable collectData.service
+
+# Finish installation and reboot
+reboot
