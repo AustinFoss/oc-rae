@@ -12,14 +12,12 @@ dataPoints = [] # An array of all data samples collected
 snapPhoto = piCam.snapPhoto
 
 # Fetches the local IP address of the Raspberry Pi Zero
-ip = os.system('hostname -I > /home/pi/environments/oc-rae/ip.txt')
+os.system('hostname -I > /home/pi/environments/oc-rae/ip.txt')
 f = open('/home/pi/environments/oc-rae/ip.txt', 'r')
 ip = f.read()
 
 # Defines the USB connected arduino device
 arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
-# Send the IP address to the arduino to be printed
-arduino.write(bytes(ip[:ip.index(' ')], 'utf-8')) 
 
 # The class object that holds the information of each data sample + a time stamp
 class DataPoint:
@@ -61,6 +59,9 @@ else:
 	# Begin data collection logic
 	while True: # Primary Loop
 
+		# Send the IP address to the arduino to be printed
+		arduino.write(bytes(ip[:ip.index(' ')], 'utf-8')) 
+		
 		# If you have more than 2 dataPoints and have collected data samples over the span of a full sample period
 		if len(dataPoints) >= 2 and (dataPoints[-1].time - dataPoints[0].time)/60 >= dataCollectionPeriod :
 			# Average all dataPeriod sample values
