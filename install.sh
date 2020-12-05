@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Make the folder where all pictures from the Raspberry Pi  Camera will be stored
-mkdir /home/pi/Pictures
+mkdir /home/pi/oc-rae/Pictures
 # Install necessary packages
-apt install python3-venv postgresql python3-pip -y
+apt install python3-venv postgresql python3-pip samba -y
 # Initialize the working Python virtual environment
 python3 -m venv /home/pi/environments/oc-rae
 
@@ -21,13 +21,15 @@ cp /home/pi/oc-rae/config/postgresql.conf /etc/postgresql/11/main/
 cp /home/pi/oc-rae/config/pg_hba.conf /etc/postgresql/11/main/
 # Copy config file to enable the Raspberry Pi Camera
 cp /home/pi/oc-rae/config/config.txt /boot/
+# Copy samba config file
+cp /home/pi/oc-rae/config/smb.conf /etc/samba/smb.conf
 
 # Ensure all directories created belong to the user 'pi'
 chown -R pi:pi /home/pi
 
 # Install all required python packages in the virtual environment
 source /home/pi/environments/oc-rae/bin/activate
-pip install -r /home/pi/environments/oc-rae/config/requirements.txt
+pip install -r /home/pi/environments/oc-rae/scripts/requirements.txt
 deactivate
 
 # Enable the Python script(s) as services the start on reboot and restart after failures
