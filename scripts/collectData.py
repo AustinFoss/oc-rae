@@ -4,20 +4,24 @@ import psycopg2
 import piCam
 import os
 
-dataCollectionPeriod = 1 # Time in minutes
-dataSampleRate = 1 # Time in seconds
-dataPoints = []
+dataCollectionPeriod = 1 # Time in minutes to collect data samples before finding the averages
+dataSampleRate = 1 # Time in seconds between samples within each period
+dataPoints = [] # An array of all data samples collected
 
+# Defines the function to capture a camera image from the piCam script
 snapPhoto = piCam.snapPhoto
 
+# Fetches the local IP address of the Raspberry Pi Zero
 ip = os.system('hostname -I > /home/pi/environments/oc-rae/ip.txt')
 f = open('/home/pi/environments/oc-rae/ip.txt', 'r')
 ip = f.read()
 
+# Defines the USB connected arduino device
 arduino = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+# Send the IP address to the arduino to be printed
+arduino.write(bytes(ip[:ip.index(' ')], 'utf-8')) 
 
-arduino.write(bytes(ip[:ip.index(' ')], 'utf-8'))
-
+# The class object that holds the information of each data sample + a time stamp
 class DataPoint:
 	def __init__(self, time, tmp, hum, lux, mst):
 		self.time = time
@@ -26,7 +30,7 @@ class DataPoint:
 		self.lux = lux
 		self.mst = mst
 
-try:
+try: # Attempt to connect to the local PostgreSQL database
 	connection = psycopg2.connect(user = "pi",
 								password = "oldsCollege",
 								host = "127.0.0.1",
@@ -48,6 +52,7 @@ try:
 
 	connection.commit()
 	cursor.close()
+	# PostgreSQL database setup confirmed
 
 except (Exception, psycopg2.Error) as error :
 	print ("Error while connecting to PostgreSQL", error)
@@ -55,41 +60,49 @@ except (Exception, psycopg2.Error) as error :
 else:
 	# Begin data collection logic
 	while True: # Primary Loop
-		arduino.write(bytes(ip[:ip.index(' ')], 'utf-8'))
-		if len(dataPoints) >= 2 and (dataPoints[-1].time - dataPoints[0].time)/60 >= dataCollectionPeriod :
-				# Average all dataPeriod sample values
-				# sampleTime = sum(dataPoints)/len(dataPoints)
-				time = []
-				tmp = []
-				hum = []
-				lux = []
-				mst = []
-				for dataPoint in dataPoints:
-					time.append(dataPoint.time)
-					tmp.append(dataPoint.tmp)
-					hum.append(dataPoint.hum)
-					lux.append(dataPoint.lux)
-					mst.append(dataPoint.mst)
-				time = str(int(round(sum(time)/len(time))))
-				cursor = connection.cursor()
-				cursor.execute("INSERT INTO data_collection values('0', " + time + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lux)/len(lux)) + ", " + str(sum(mst)/len(mst)) + ");")
-				connection.commit()
-				cursor.close()
-				print("Sampled Data")
-				dataPoints = []
 
-				snapPhoto(time)
-				print("Photo taken")
-		else:				
-			data = arduino.readline()
+		# If you have more than 2 dataPoints and have collected data samples over the span of a full sample period
+		if len(dataPoints) >= 2 and (dataPoints[-1].time - dataPoints[0].time)/60 >= dataCollectionPeriod :
+			# Average all dataPeriod sample values
+			time = []
+			tmp = []
+			hum = []
+			lux = []
+			mst = []
+			for dataPoint in dataPoints:
+				time.append(dataPoint.time)
+				tmp.append(dataPoint.tmp)
+				hum.append(dataPoint.hum)
+				lux.append(dataPoint.lux)
+				mst.append(dataPoint.mst)
+
+			# Write average data samples for that period to the PostgreSQL database
+			cursor = connection.cursor()
+			cursor.execute("INSERT INTO data_collection values('0', " + str(int(round(sum(time)/len(time)))) + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lux)/len(lux)) + ", " + str(sum(mst)/len(mst)) + ");")
+			connection.commit()
+			cursor.close()
+
+			# Reset data points
+			dataPoints = []
+			print("Sampled Data")	
+			# Take a photo for that data period			
+			snapPhoto(time)
+			print("Photo taken")
+		
+		else: 
+			# Watch for a data line on the USB connection
+			data = arduino.readline() 
 			if data:
-				data = data[:-2].decode("utf-8")
+				# Convert the USB information to usable information
+				data = data[:-2].decode("utf-8") 
 				slicePoints = []
 				i = 0
 				tmp = 0
 				hum = 0
 				lux = 0
 				mst = 0
+
+				#
 				for character in data:
 					if character == "T" or character == "H" or character == "L" or character == "M":
 						slicePoints.append(i)
