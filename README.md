@@ -36,3 +36,7 @@ By default you have 2 users:
 2. PostgresQL `pi` user with a default password of `oldsCollege`
 
 If you change you the PotgreSQL user password it must also be changed in the Python scripts.
+
+# Arduino Sensor Node
+
+All of the above assumes you have flashed an Arduino with the `/arduino/sensor_node_vXX.XX` file and attached the sensors correctly.

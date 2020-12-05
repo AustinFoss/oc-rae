@@ -61,7 +61,7 @@ else:
 
 		# Send the IP address to the arduino to be printed
 		arduino.write(bytes(ip[:ip.index(' ')], 'utf-8')) 
-		
+
 		# If you have more than 2 dataPoints and have collected data samples over the span of a full sample period
 		if len(dataPoints) >= 2 and (dataPoints[-1].time - dataPoints[0].time)/60 >= dataCollectionPeriod :
 			# Average all dataPeriod sample values
@@ -76,10 +76,11 @@ else:
 				hum.append(dataPoint.hum)
 				lux.append(dataPoint.lux)
 				mst.append(dataPoint.mst)
+			time = str(int(round(sum(time)/len(time))))
 
 			# Write average data samples for that period to the PostgreSQL database
 			cursor = connection.cursor()
-			cursor.execute("INSERT INTO data_collection values('0', " + str(int(round(sum(time)/len(time)))) + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lux)/len(lux)) + ", " + str(sum(mst)/len(mst)) + ");")
+			cursor.execute("INSERT INTO data_collection values('0', " + time + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lux)/len(lux)) + ", " + str(sum(mst)/len(mst)) + ");")
 			connection.commit()
 			cursor.close()
 
