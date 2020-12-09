@@ -76,18 +76,23 @@ void loop() {
   // Print sensor data to the LCD display
   lcd.setCursor(0,1);
   lcd.print("T");
+  lcd.print("   ");
+  lcd.setCursor(1,1);
   lcd.print(round(tmp));
-  lcd.setCursor(3,1);
-  lcd.print(" ");
+  lcd.setCursor(4,1);
   lcd.print("H");
+  lcd.print("   ");
+  lcd.setCursor(5,1);
   lcd.print(round(hum));
-  lcd.setCursor(7,1);
-  lcd.print(" ");
+  lcd.setCursor(8,1);
   lcd.print("M");
+  lcd.print("   ");
+  lcd.setCursor(9,1);
   lcd.print(round(mst));
-  lcd.setCursor(11,1);
-  lcd.print(" ");
+  lcd.setCursor(12,1);
   lcd.print("L");
+  lcd.print("   ");
+  lcd.setCursor(13,1);
   lcd.print(round(lux));
   
   delay(100);
