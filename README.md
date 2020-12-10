@@ -23,7 +23,7 @@ Enter the following to update the Pi Zero, install git, clone this repository to
 `sudo apt update`   
 `sudo apt upgrade`   
 `sudo apt install git`  
-`cd ~/`
+`cd ~/`  
 `git clone https://github.com/AustinFoss/oc-rae.git`  
 `sudo oc-rae/install.sh`  
 
