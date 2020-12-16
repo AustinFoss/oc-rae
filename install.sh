@@ -26,6 +26,7 @@ cp /home/pi/oc-rae/config/smb.conf /etc/samba/smb.conf
 
 # Ensure all directories created belong to the user 'pi'
 chown -R pi:pi /home/pi
+chmod -R 777 /home/pi/oc-rae
 
 # Install all required python packages in the virtual environment
 source /home/pi/environments/oc-rae/bin/activate

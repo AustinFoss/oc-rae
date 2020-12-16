@@ -4,8 +4,8 @@ import psycopg2
 import piCam
 import os
 
-dataCollectionPeriod = 1 # Time in minutes to collect data samples before finding the averages
-dataSampleRate = 1 # Time in seconds between samples within each period
+dataCollectionPeriod = 0 # Time in minutes to collect data samples before finding the averages
+dataSampleRate = 0 # Time in seconds between samples within each period
 dataPoints = [] # An array of all data samples collected
 
 # Defines the function to capture a camera image from the piCam script
@@ -47,7 +47,7 @@ try: # Attempt to connect to the local PostgreSQL database
 	record = cursor.fetchone()
 	if record == (False,):
 		cursor.execute("CREATE TABLE settings(setting VARCHAR(100), value VARCHAR(100));")
-
+		cursor.execute("INSERT INTO settings (settings, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0);")
 	connection.commit()
 	cursor.close()
 	# PostgreSQL database setup confirmed
@@ -135,3 +135,9 @@ else:
 					dataPoints.append(DataPoint(tStamp, float(tmp), float(hum), float(lux), float(mst)))
 				else:
 					pass # Possible error negation
+		
+# def dataCollection(connection)
+# 	cursor = connection.cursor()
+# 	cursor.execute("SELECT value FROM settings WHERE setting = 'dataCollectionPeriod' AND setting = 'dataSampleRate';")
+# 	record = cursor.fetchmany(2)
+	
