@@ -22,8 +22,8 @@ Enter the following to update the Pi Zero, install git, clone this repository to
 
 `sudo apt update`   
 `sudo apt upgrade`   
-`sudo apt install git`  
-`cd ~/`
+`sudo apt install git python3-venv postgresql python3-pip samba`  
+`cd ~/`  
 `git clone https://github.com/AustinFoss/oc-rae.git`  
 `sudo oc-rae/install.sh`  
 
