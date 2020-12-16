@@ -47,7 +47,7 @@ try: # Attempt to connect to the local PostgreSQL database
 	record = cursor.fetchone()
 	if record == (False,):
 		cursor.execute("CREATE TABLE settings(setting VARCHAR(100), value VARCHAR(100));")
-		cursor.execute("INSERT INTO settings (settings, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0);")
+		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0);")
 	connection.commit()
 	cursor.close()
 	# PostgreSQL database setup confirmed
