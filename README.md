@@ -8,7 +8,7 @@ https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2
 or  
 https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-12-04/2020-12-02-raspios-buster-armhf-lite.zip.torrent  
 
-Once you have this disk image flashed to a microSD card, before removing it to boot the Pi Zero, please copy both the `/ssh` and `/wpa_supplicant.conf` to the boot partition of the SD cad. Open the `/boot/wpa_supplicant.conf` file you just copied to the card, and edit lines 5 & 8 with the correct network name and corresponding password.  
+Once you have this disk image flashed to a microSD card, before removing it to boot the Pi Zero, please copy both the `/ssh` and `/wpa_supplicant.conf` to the boot partition of the SD card. Open the `/boot/wpa_supplicant.conf` file you just copied to the card, and edit lines 5 & 8 with the correct network name and corresponding password.  
 
 `ssid="NETWORK_SSID"`  
 
