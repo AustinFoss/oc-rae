@@ -4,8 +4,8 @@ import psycopg2
 import piCam
 import os
 
-dataCollectionPeriod = 0 # Time in minutes to collect data samples before finding the averages
-dataSampleRate = 0 # Time in seconds between samples within each period
+dataCollectionPeriod = 15 # Time in minutes to collect data samples before finding the averages
+dataSampleRate = 1 # Time in seconds between samples within each period
 dataPoints = [] # An array of all data samples collected
 
 # Defines the function to capture a camera image from the piCam script
