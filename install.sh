@@ -39,5 +39,8 @@ chmod 644 /etc/systemd/system/collectData.service
 systemctl daemon-reload
 systemctl enable collectData.service
 
+#Set Samba user password
+smbpasswd -a pi
+
 # Finish installation and reboot
 reboot
