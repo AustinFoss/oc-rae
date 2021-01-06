@@ -9,7 +9,7 @@ python3 -m venv /home/pi/environments/oc-rae
 sudo -u postgres createuser -s pi
 sudo -u postgres createdb pi
 sudo -u pi psql << EOF
-ALTER ROLE pi WITH PASSWORD 'oldsCollege';
+ALTER ROLE pi WITH REPLICATION PASSWORD 'oldsCollege';
 EOF
 
 # Copy Python scripts to the virtual environment
