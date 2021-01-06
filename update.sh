@@ -1,5 +1,7 @@
 #!/bin/bash
 
+systemctl stop collectData.service
+
 git pull
 
 sudo -u pi psql << EOF
