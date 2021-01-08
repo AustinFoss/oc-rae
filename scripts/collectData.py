@@ -4,9 +4,13 @@ import psycopg2
 import piCam
 import os
 
+import sensors
+
 dataCollectionPeriod = 0 # Time in minutes to collect data samples before finding the averages
 dataSampleRate = 0 # Time in seconds between samples within each period
 dataPoints = [] # An array of all data samples collected
+moistureMax = 0 # Soil moisture calibration value
+moistureMax = 0 # Soil moisture calibration value
 
 # Defines the function to capture a camera image from the piCam script
 snapPhoto = piCam.snapPhoto
@@ -46,6 +50,12 @@ def checkSettings(connection):
 		if setting[0] == "dataSampleRate":
 			global dataSampleRate
 			dataSampleRate = int(setting[1])
+		if setting[0] == "moistureMax":
+			global moistureMax
+			moistureMax = int(setting[1])
+		if setting[0] == "moistureMin":
+			global moistureMin
+			moistureMin = int(setting[1])
 
 try: # Attempt to connect to the local PostgreSQL database
 	connection = psycopg2.connect(
@@ -68,7 +78,7 @@ try: # Attempt to connect to the local PostgreSQL database
 	record = cursor.fetchone()
 	if record == (False,):
 		cursor.execute("CREATE TABLE settings(setting VARCHAR(100), value VARCHAR(100));")
-		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0);")
+		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0), ('moistureMax', 0), ('moistureMin', 0);")
 	else:
 		checkSettings(connection)
 
@@ -127,8 +137,7 @@ else:
 					hum = 0
 					lux = 0
 					mst = 0
-
-					#
+					
 					for character in data:
 						if character == "T" or character == "H" or character == "L" or character == "M":
 							slicePoints.append(i)
@@ -156,6 +165,9 @@ else:
 								mst = data[point+1:slicePoints[slicePoints.index(point)+1]]
 					tStamp = pyTime.time()				
 					if len(dataPoints) != 0 and tStamp - dataPoints[-1].time >= dataSampleRate or len(dataPoints) == 0:
+						if moistureMax != 0 and moistureMin != 0:
+							mst = sensors.soilMoisture(moistureMin, moistureMax, float(mst))
+
 						dataPoints.append(DataPoint(tStamp, float(tmp), float(hum), float(lux), float(mst)))
 					else:
 						pass # Possible error negation
