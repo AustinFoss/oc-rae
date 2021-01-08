@@ -22,11 +22,6 @@ char ipAddress[15];
 // LCD display settings
 LiquidCrystal_I2C lcd(0x27,16,2); 
 
-// Soil Moisture sensor callibration variables 
-const int dryValue = 526; 
-const int soakedValue = 256;
-const float scaleValue = dryValue - soakedValue;
-
 float tmp, hum, analogVolt, lux, mst;
 
 void setup() {
@@ -49,7 +44,7 @@ void loop() {
   
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Read & calculate all sensor values
-  mst = (1-((analogRead(SOIL_MOISTURE_PIN)-soakedValue)/scaleValue))*100;
+  mst = analogRead(SOIL_MOISTURE_PIN);
   
   analogVolt = (float)analogRead(TEMPERATURE_PIN) / ADC_RESOLUTION * VREF;
   // Convert voltage to temperature (℃, centigrade)
