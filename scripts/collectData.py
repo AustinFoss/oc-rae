@@ -38,9 +38,9 @@ class DataPoint:
 
 def checkSettings(connection):
 	cursor = connection.cursor()
-	cursor.execute("SELECT setting, value FROM settings WHERE setting = 'dataCollectionPeriod' OR setting = 'dataSampleRate';")
+	cursor.execute("SELECT setting, value FROM settings;")
 	connection.commit()
-	settings = cursor.fetchmany(2)
+	settings = cursor.fetchmany(4)
 	cursor.close()
 	
 	for setting in settings:
@@ -56,7 +56,6 @@ def checkSettings(connection):
 		if setting[0] == "moistureMin":
 			global moistureMin
 			moistureMin = int(setting[1])
-
 try: # Attempt to connect to the local PostgreSQL database
 	connection = psycopg2.connect(
 		user = "pi",
@@ -167,7 +166,6 @@ else:
 					if len(dataPoints) != 0 and tStamp - dataPoints[-1].time >= dataSampleRate or len(dataPoints) == 0:
 						if moistureMax != 0 and moistureMin != 0:
 							mst = sensors.soilMoisture(moistureMin, moistureMax, float(mst))
-
 						dataPoints.append(DataPoint(tStamp, float(tmp), float(hum), float(lux), float(mst)))
 					else:
 						pass # Possible error negation
