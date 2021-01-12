@@ -2,7 +2,7 @@
 
 systemctl stop collectData.service
 
-#git pull
+git pull
 
 sudo -u pi psql << EOF
 DROP TABLE IF EXISTS settings;
