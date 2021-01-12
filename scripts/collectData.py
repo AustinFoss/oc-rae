@@ -11,6 +11,12 @@ dataSampleRate = 0 # Time in seconds between samples within each period
 dataPoints = [] # An array of all data samples collected
 moistureMax = 0 # Soil moisture calibration value
 moistureMax = 0 # Soil moisture calibration value
+lightHeight = 23
+soilHeight = 0
+plant1Height = 0
+plant2Height = 0
+plant3Height = 0
+plant4Height = 0
 
 # Defines the function to capture a camera image from the piCam script
 snapPhoto = piCam.snapPhoto
@@ -38,24 +44,37 @@ class DataPoint:
 
 def checkSettings(connection):
 	cursor = connection.cursor()
-	cursor.execute("SELECT setting, value FROM settings;")
+	cursor.execute("SELECT * FROM settings;")
 	connection.commit()
-	settings = cursor.fetchmany(4)
+	settings = cursor.fetchmany(8)
 	cursor.close()
 	
 	for setting in settings:
 		if setting[0] == "dataCollectionPeriod":
 			global dataCollectionPeriod
-			dataCollectionPeriod = int(setting[1])
+			dataCollectionPeriod = float(setting[1])
 		if setting[0] == "dataSampleRate":
 			global dataSampleRate
-			dataSampleRate = int(setting[1])
+			dataSampleRate = float(setting[1])
 		if setting[0] == "moistureMax":
 			global moistureMax
-			moistureMax = int(setting[1])
+			moistureMax = float(setting[1])
 		if setting[0] == "moistureMin":
 			global moistureMin
-			moistureMin = int(setting[1])
+			moistureMin = float(setting[1])
+		if setting[0] == "plant1Height":
+			global plant1Height
+			plant1Height = float(setting[1])
+		if setting[0] == "plant2Height":
+			global plant2Height
+			plant2Height = float(setting[1])
+		if setting[0] == "plant3Height":
+			global plant3Height
+			plant3Height = float(setting[1])
+		if setting[0] == "plant4Height":
+			global plant4Height
+			plant4Height = float(setting[1])
+
 try: # Attempt to connect to the local PostgreSQL database
 	connection = psycopg2.connect(
 		user = "pi",
@@ -70,14 +89,14 @@ try: # Attempt to connect to the local PostgreSQL database
 	cursor.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = 'data_collection');")
 	record = cursor.fetchone()
 	if record == (False,):
-		cursor.execute("CREATE TABLE data_collection(posted BOOLEAN NOT NULL, time_stamp FLOAT, temperature FLOAT, relative_humidity FLOAT, ambient_light FLOAT, soil_moisture FLOAT);")
+		cursor.execute("CREATE TABLE data_collection(posted BOOLEAN NOT NULL, time_stamp FLOAT, temperature FLOAT, relative_humidity FLOAT, ambient_light FLOAT, soil_moisture FLOAT, plant1Height FLOAT, plant2Height FLOAT, plant3Height FLOAT, plant4Height FLOAT);")
 
 	# Create settings table if none present
 	cursor.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = 'settings');")
 	record = cursor.fetchone()
 	if record == (False,):
 		cursor.execute("CREATE TABLE settings(setting VARCHAR(100), value VARCHAR(100));")
-		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0), ('moistureMax', 0), ('moistureMin', 0);")
+		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0), ('moistureMax', 0), ('moistureMin', 0), ('plant1Height', 0), ('plant2Height', 0), ('plant3Height', 0), ('plant4Height', 0);")
 	else:
 		checkSettings(connection)
 
@@ -113,7 +132,7 @@ else:
 
 				# Write average data samples for that period to the PostgreSQL database
 				cursor = connection.cursor()
-				cursor.execute("INSERT INTO data_collection values('0', " + time + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lux)/len(lux)) + ", " + str(sum(mst)/len(mst)) + ");")
+				cursor.execute("INSERT INTO data_collection values('0', " + time + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lux)/len(lux)) + ", " + str(sum(mst)/len(mst)) + ", " + str(plant1Height) + ", " + str(plant2Height) + ", " + str(plant3Height) + ", " + str(plant4Height) + ");")
 				connection.commit()
 				cursor.close()
 
