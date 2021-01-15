@@ -46,7 +46,7 @@ def checkSettings(connection):
 	cursor = connection.cursor()
 	cursor.execute("SELECT * FROM settings;")
 	connection.commit()
-	settings = cursor.fetchmany(8)
+	settings = cursor.fetchall()
 	cursor.close()
 	
 	for setting in settings:
@@ -96,7 +96,7 @@ try: # Attempt to connect to the local PostgreSQL database
 	record = cursor.fetchone()
 	if record == (False,):
 		cursor.execute("CREATE TABLE settings(setting VARCHAR(100), value VARCHAR(100));")
-		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0), ('moistureMax', 0), ('moistureMin', 0), ('plant1Height', 0), ('plant2Height', 0), ('plant3Height', 0), ('plant4Height', 0);")
+		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0), ('moistureMax', 0), ('moistureMin', 0), ('lightOffMax', 0), ('lightOnMin', 0), ('plant1Height', 0), ('plant2Height', 0), ('plant3Height', 0), ('plant4Height', 0);")
 	else:
 		checkSettings(connection)
 
