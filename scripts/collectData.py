@@ -1,9 +1,8 @@
 import serial
 import time as pyTime
 import psycopg2
-import piCam
 import os
-
+import gc
 import sensors
 
 dataCollectionPeriod = 0 # Time in minutes to collect data samples before finding the averages
@@ -17,9 +16,6 @@ plant1Height = 0
 plant2Height = 0
 plant3Height = 0
 plant4Height = 0
-
-# Defines the function to capture a camera image from the piCam script
-snapPhoto = piCam.snapPhoto
 
 # Fetches the local IP address of the Raspberry Pi Zero
 os.system('hostname -I > /home/pi/environments/oc-rae/ip.txt')
@@ -139,8 +135,10 @@ else:
 				# Reset data points
 				dataPoints = []
 				print("Sampled Data")	
-				# Take a photo for that data period			
-				snapPhoto(time)
+				
+				# Take a photo for that data period		
+				os.system('python piCam.py ' + time)	
+				gc.collect()
 				print("Photo taken")
 			
 			else: 
@@ -190,4 +188,7 @@ else:
 						pass # Possible error negation
 		else:
 			dataPoints = []
+
+		pyTime.sleep(1)
+		gc.collect()
 	

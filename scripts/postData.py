@@ -2,65 +2,86 @@ import psycopg2
 import time
 import requests
 import json
+import gc
 
-remoteServer = 'http://192.168.7.105:5000/'
+postingServer = 0
+lastPosted = 0
 
-def postData():
-        
-    try:
-        postingConnection = psycopg2.connect(user = "postgres",
-                                        password = "postgres",
-                                        host = "127.0.0.1",
-                                        port = "5432",
-                                        database = "postgres")
-        postingCursor = postingConnection.cursor()
-        # Create dataCollection table if none present
-        postingCursor.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = 'posted_data');")
-        record = postingCursor.fetchone()
-        if record == (False,):
-            postingCursor.execute("CREATE TABLE posted_data(time_stamp FLOAT, temperature FLOAT, relative_humidity FLOAT, ambient_light FLOAT, soil_moisture FLOAT);")
+def checkSettings(connection):
+    cursor = connection.cursor()
 
-    except (Exception, psycopg2.Error) as error :
-        print ("Error while connecting to PostgreSQL", error)
+    cursor.execute("SELECT * FROM settings WHERE setting = 'lastPosted';")
+    record = cursor.fetchall()
+    if len(record) == 0:
+        cursor.execute("INSERT INTO settings (setting, value) VALUES ('lastPosted', 0);")
+        connection.commit()
     else:
-    
-        while True:
-            # Check for row where posted = false
-            postingCursor = postingConnection.cursor()
-            postingCursor.execute("SELECT time_stamp, temperature, relative_humidity, ambient_light, soil_moisture FROM public.data_collection WHERE posted = false LIMIT 1;")
-            record = postingCursor.fetchone()
-            postingCursor.close()
+        global lastPosted
+        lastPosted = record[0][1]
 
-            if record == None:
-                print("Nothing to post")
-                pass
+    cursor.execute("SELECT * FROM settings WHERE setting = 'postingServer';")
+    record = cursor.fetchall()
+    if len(record) == 0:
+        cursor.execute("INSERT INTO settings (setting, value) VALUES ('postingServer', 0);")
+        connection.commit()   
+    else:
+        global postingServer
+        postingServer = record[0][1]
 
-            else:
+    cursor.close()
+        
+try:
+    connection = psycopg2.connect(
+        user = "pi",
+        password = "oldsCollege",
+        host = "127.0.0.1",
+        port = "5432",
+        database = "pi"
+    )
+
+except (Exception, psycopg2.Error) as error :
+    print ("Error while connecting to PostgreSQL", error)
+else:
+
+    while True:
+        checkSettings(connection)
+
+        if postingServer == 0:
+            print("Nowhere to post")
+            pass
+
+        else:
+            cursor = connection.cursor()
+            cursor.execute("SELECT MIN(time_stamp) FROM data_collection WHERE time_Stamp > " + lastPosted + ";")
+            record = cursor.fetchone()
+            
+            # If there is no new data point wait for a few seconds then check again
+            if record[0] != None:
+
+                cursor.execute("SELECT * FROM data_collection WHERE time_stamp = " + str(record[0]) + ";")
+                record = cursor.fetchone()
+                cursor.close()
+
                 data = {
-                    "time_stamp": record[0],
-                    "temperature_c": record[1],
-                    "relative_humidity": record[2],
-                    "ambient_light": record[3],
-                    "soil_moisture": record[4]
+                    "time_stamp": record[1],
+                    "temperature_c": record[2],
+                    "relative_humidity": record[3],
+                    "ambient_light": record[4],
+                    "soil_moisture": record[5]
                 }
-                # files = {'file': open('/home/pi/rem/photos/' + str(int(record[0])) + '.jpg', 'rb')}
-                files = [
-                    # ('data', json.dumps(data)),
-                    ('photo', (str(int(record[0])) + '.jpg', open('/home/pi/rem/photos/' + str(int(record[0])) + '.jpg', 'rb'), 'image/jpg'))
-                ]
+
                 # Post data to server
-                response = requests.post(remoteServer, files=files)
-                print(response)
+                response = requests.post(postingServer, data={'Token': 'Token1', 'data': data})
                 
-                # postingCursor = postingConnection.cursor()
-                # postingCursor.execute("UPDATE public.data_collection SET posted = True WHERE time_stamp = " + str(record[0]) + ";")
-                # postingConnection.commit()
-                # postingCursor.close()
-
-                # postingCursor = postingConnection.cursor()
-                # postingCursor.execute("INSERT INTO posted_data values(" + str(record[0]) + ", " + str(record[1]) + ", " + str(record[2]) + ", " + str(record[3]) + ", " + str(record[4]) + ");")
-                # postingConnection.commit()
-                # postingCursor.close()
-
-            time.sleep(3)
-postData()
+                if response.status_code != 200:
+                    print("Error Posting: Handle Error")
+                else:
+                    print(data['time_stamp'])
+                    
+                    cursor = connection.cursor()
+                    cursor.execute("UPDATE settings SET value = " + str(data['time_stamp']) + " WHERE setting = 'lastPosted';")
+                    connection.commit()
+                    cursor.close()   
+                    
+        time.sleep(1)
+        gc.collect()
