@@ -4,6 +4,7 @@ import psycopg2
 import os
 import gc
 import sensors
+from piCam import snapPhoto
 
 dataCollectionPeriod = 0 # Time in minutes to collect data samples before finding the averages
 dataSampleRate = 0 # Time in seconds between samples within each period
@@ -135,9 +136,9 @@ else:
 				# Reset data points
 				dataPoints = []
 				print("Sampled Data")	
-				
+
 				# Take a photo for that data period		
-				os.system('python piCam.py ' + time)	
+				snapPhoto(time)
 				gc.collect()
 				print("Photo taken")
 			

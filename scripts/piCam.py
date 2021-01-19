@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from time import sleep
 from picamera import PiCamera
 import sys
@@ -17,5 +15,5 @@ def snapPhoto(name):
     finally:
         camera.close()
 
-snapPhoto(str(sys.argv[1]))
+# snapPhoto(str(sys.argv[1]))
 gc.collect()

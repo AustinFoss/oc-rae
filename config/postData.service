@@ -5,6 +5,7 @@ Description=Data Posting Process
 # Command to execute when the service is started
 ExecStart=/home/pi/environments/oc-rae/bin/python /home/pi/environments/oc-rae/postData.py
 Restart=always
+StandardOutput=file:/var/log/postData
 
 [Install]
 WantedBy=default.target
