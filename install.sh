@@ -41,6 +41,7 @@ chown root:root /etc/systemd/system/postData.service
 chmod 644 /etc/systemd/system/postData.service
 systemctl daemon-reload
 systemctl enable collectData.service
+systemctl enable postData.service
 
 #Set Samba user password
 smbpasswd -a pi
