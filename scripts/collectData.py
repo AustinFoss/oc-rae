@@ -139,7 +139,6 @@ else:
 
 				# Take a photo for that data period		
 				snapPhoto(time)
-				gc.collect()
 				print("Photo taken")
 			
 			else: 

@@ -1,9 +1,7 @@
 from time import sleep
 from picamera import PiCamera
-import sys
+# import sys
 import gc
-
-
 
 def snapPhoto(name):
     try: 
@@ -14,6 +12,6 @@ def snapPhoto(name):
         camera.capture('/home/pi/oc-rae/Pictures/' + name + '.jpg')
     finally:
         camera.close()
+        gc.collect()
 
 # snapPhoto(str(sys.argv[1]))
-gc.collect()
