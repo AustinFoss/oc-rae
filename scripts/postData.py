@@ -64,7 +64,7 @@ else:
 
                 data = {
                     'Token': 'Token1',
-                    "time_stamp": record[1],
+                    "time_stamp": round(record[1]),
                     "temperature_c": record[2],
                     "relative_humidity": record[3],
                     "ambient_light": record[4],
