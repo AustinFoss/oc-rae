@@ -3,6 +3,7 @@ import time
 import requests
 import json
 import gc
+import base64
 
 postingServer = 0
 lastPosted = 0
@@ -62,26 +63,28 @@ else:
                 record = cursor.fetchone()
                 cursor.close()
 
-                data = {
-                    'Token': 'Token1',
-                    "time_stamp": round(record[1]),
-                    "temperature_c": record[2],
-                    "relative_humidity": record[3],
-                    "ambient_light": record[4],
-                    "soil_moisture": record[5],
-                    "img_path": "/home/pi/oc-rae/Pictures/" + str(round(record[1])) + ".jpg"
-                }
-
-                # Post data to server
-                response = requests.post(postingServer, data=data)
+                with open("/home/pi/oc-rae/Pictures/" + str(round(record[1])) + ".jpg", 'rb') as img:
+                    data = {
+                        'Token': 'Token1',
+                        "data": {
+                            "time_stamp": round(record[1]),
+                            "temperature_c": record[2],
+                            "relative_humidity": record[3],
+                            "ambient_light": record[4],
+                            "soil_moisture": record[5]
+                        },
+                        'image': base64.b64encode(img.read()).decode('utf-8')
+                    }
+                    headers = { 'Content-Type':'application/json;charset=UTF-8' }
+                    response = requests.post(postingServer, headers=headers, data=json.dumps(data))
                 
                 if response.status_code != 200:
                     print("Error Posting: Handle Error")
                 else:
-                    print(data['img_path'])
+                    print(round(record[1]))
                     
                     cursor = connection.cursor()
-                    cursor.execute("UPDATE settings SET value = " + str(data['time_stamp']) + " WHERE setting = 'lastPosted';")
+                    cursor.execute("UPDATE settings SET value = " + str(record[1]) + " WHERE setting = 'lastPosted';")
                     connection.commit()
                     cursor.close()   
                     
