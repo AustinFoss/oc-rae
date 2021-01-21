@@ -68,7 +68,8 @@ else:
                     "temperature_c": record[2],
                     "relative_humidity": record[3],
                     "ambient_light": record[4],
-                    "soil_moisture": record[5]
+                    "soil_moisture": record[5],
+                    "img_path": "/home/pi/oc-rae/Pictures/" + str(round(record[1])) + ".jpg"
                 }
 
                 # Post data to server
@@ -77,7 +78,7 @@ else:
                 if response.status_code != 200:
                     print("Error Posting: Handle Error")
                 else:
-                    print(data['time_stamp'])
+                    print(data['img_path'])
                     
                     cursor = connection.cursor()
                     cursor.execute("UPDATE settings SET value = " + str(data['time_stamp']) + " WHERE setting = 'lastPosted';")
