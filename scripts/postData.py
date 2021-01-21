@@ -63,6 +63,7 @@ else:
                 cursor.close()
 
                 data = {
+                    'Token': 'Token1',
                     "time_stamp": record[1],
                     "temperature_c": record[2],
                     "relative_humidity": record[3],
@@ -71,7 +72,7 @@ else:
                 }
 
                 # Post data to server
-                response = requests.post(postingServer, data={'Token': 'Token1', 'data': data})
+                response = requests.post(postingServer, data=data)
                 
                 if response.status_code != 200:
                     print("Error Posting: Handle Error")
