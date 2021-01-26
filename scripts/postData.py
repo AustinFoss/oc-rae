@@ -63,20 +63,20 @@ else:
                 record = cursor.fetchone()
                 cursor.close()
 
-                with open("/home/pi/oc-rae/Pictures/" + str(round(record[1])) + ".jpg", 'rb') as img:
-                    data = {
-                        'Token': 'Token1',
-                        "data": {
-                            "time_stamp": round(record[1]),
-                            "temperature_c": record[2],
-                            "relative_humidity": record[3],
-                            "ambient_light": record[4],
-                            "soil_moisture": record[5]
-                        },
-                        'image': base64.b64encode(img.read()).decode('utf-8')
-                    }
-                    headers = { 'Content-Type':'application/json;charset=UTF-8' }
-                    response = requests.post(postingServer, headers=headers, data=json.dumps(data))
+                data = {
+                    "time_stamp": round(record[1]),
+                    "temperature_c": record[2],
+                    "relative_humidity": record[3],
+                    "ambient_light": record[4],
+                    "soil_moisture": record[5]                    
+                }
+                with open("/home/pi/oc-rae/Pictures/" + str(round(record[1])) + ".png", 'rb') as img:
+                    files = [
+                        ('Token', (None, 'aNewToken')),
+                        ('data', (str(round(record[1])) + ".png", img, 'image/png')),
+                        ('json', (None, json.dumps(data), 'application/json'))    
+                    ]                
+                    response = requests.post(postingServer, auth=('Token1', 'student'), files=files)
                 
                 if response.status_code != 200:
                     print("Error Posting: Handle Error")

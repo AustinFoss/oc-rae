@@ -6,10 +6,11 @@ import gc
 def snapPhoto(name):
     try: 
         camera = PiCamera()
-        camera.resolution = (3280, 2464)
+        # camera.resolution = (3280, 2464)
+        camera.resolution = (2160,1440)
         camera.start_preview()
         sleep(2) # Camera warm-up time
-        camera.capture('/home/pi/oc-rae/Pictures/' + name + '.jpg')
+        camera.capture('/home/pi/oc-rae/Pictures/' + name + '.png')
     finally:
         camera.close()
 
