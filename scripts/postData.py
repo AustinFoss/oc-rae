@@ -58,7 +58,7 @@ else:
             
             # If there is no new data point wait for a few seconds then check again
             if record[0] != None:
-
+                time.sleep(10)
                 cursor.execute("SELECT * FROM data_collection WHERE time_stamp = " + str(record[0]) + ";")
                 record = cursor.fetchone()
                 cursor.close()
@@ -74,7 +74,7 @@ else:
                     files = [
                         ('Token', (None, 'aNewToken')),
                         ('data', (str(round(record[1])) + ".png", img, 'image/png')),
-                        ('json', (None, json.dumps(data), 'application/json'))    
+                        ('sensor', (None, json.dumps(data), 'application/json'))    
                     ]                
                     response = requests.post(postingServer, auth=('Token1', 'student'), files=files)
                 

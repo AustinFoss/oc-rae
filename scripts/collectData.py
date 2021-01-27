@@ -182,9 +182,12 @@ else:
 								mst = data[point+1:slicePoints[slicePoints.index(point)+1]]
 					tStamp = pyTime.time()				
 					if len(dataPoints) != 0 and tStamp - dataPoints[-1].time >= dataSampleRate or len(dataPoints) == 0:
-						if moistureMax != 0 and moistureMin != 0:
-							mst = sensors.soilMoisture(moistureMin, moistureMax, float(mst))
-						dataPoints.append(DataPoint(tStamp, float(tmp), float(hum), float(lux), float(mst)))
+						try:
+							if moistureMax != 0 and moistureMin != 0:
+								mst = sensors.soilMoisture(moistureMin, moistureMax, float(mst))						
+							dataPoints.append(DataPoint(tStamp, float(tmp), float(hum), float(lux), float(mst)))
+						except:
+							pass # error negation
 					else:
 						pass # Possible error negation
 		else:
