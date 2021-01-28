@@ -32,11 +32,11 @@ arduino.write(bytes(ip[:ip.index(' ')], 'utf-8'))
 
 # The class object that holds the information of each data sample + a time stamp
 class DataPoint:
-	def __init__(self, time, tmp, hum, lux, mst):
+	def __init__(self, time, tmp, hum, lit, mst):
 		self.time = time
 		self.tmp = tmp
 		self.hum = hum
-		self.lux = lux
+		self.lit = lit
 		self.mst = mst
 
 def checkSettings(connection):
@@ -93,7 +93,7 @@ try: # Attempt to connect to the local PostgreSQL database
 	record = cursor.fetchone()
 	if record == (False,):
 		cursor.execute("CREATE TABLE settings(setting VARCHAR(100), value VARCHAR(100));")
-		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0), ('moistureMax', 0), ('moistureMin', 0), ('lightOffMax', 0), ('lightOnMin', 0), ('plant1Height', 0), ('plant2Height', 0), ('plant3Height', 0), ('plant4Height', 0);")
+		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0), ('moistureMax', 0), ('moistureMin', 0), ('lightOffMax', 0), ('lightOnMin', 0), ('plant1Height', 0), ('plant2Height', 0), ('plant3Height', 0), ('plant4Height', 0), ('token', 0), ('postgresql_backup', 0);")
 	else:
 		checkSettings(connection)
 
@@ -117,19 +117,19 @@ else:
 				time = []
 				tmp = []
 				hum = []
-				lux = []
+				lit = []
 				mst = []
 				for dataPoint in dataPoints:
 					time.append(dataPoint.time)
 					tmp.append(dataPoint.tmp)
 					hum.append(dataPoint.hum)
-					lux.append(dataPoint.lux)
+					lit.append(dataPoint.lit)
 					mst.append(dataPoint.mst)
 				time = str(int(round(sum(time)/len(time))))
 
 				# Write average data samples for that period to the PostgreSQL database
 				cursor = connection.cursor()
-				cursor.execute("INSERT INTO data_collection values('0', " + time + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lux)/len(lux)) + ", " + str(sum(mst)/len(mst)) + ", " + str(plant1Height) + ", " + str(plant2Height) + ", " + str(plant3Height) + ", " + str(plant4Height) + ");")
+				cursor.execute("INSERT INTO data_collection values('0', " + time + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lit)/len(lit)) + ", " + str(sum(mst)/len(mst)) + ", " + str(plant1Height) + ", " + str(plant2Height) + ", " + str(plant3Height) + ", " + str(plant4Height) + ");")
 				connection.commit()
 				cursor.close()
 
@@ -152,7 +152,7 @@ else:
 					i = 0
 					tmp = 0
 					hum = 0
-					lux = 0
+					lit = 0
 					mst = 0
 					
 					for character in data:
@@ -172,9 +172,9 @@ else:
 								hum = data[point+1:slicePoints[slicePoints.index(point)+1]]
 						if data[point] == "L":
 							if point == slicePoints[-1]:
-								lux = data[point+1:]
+								lit = data[point+1:]
 							else:
-								lux = data[point+1:slicePoints[slicePoints.index(point)+1]]
+								lit = data[point+1:slicePoints[slicePoints.index(point)+1]]
 						if data[point] == "M":
 							if point == slicePoints[-1]:
 								mst = data[point+1:]
@@ -185,7 +185,7 @@ else:
 						try:
 							if moistureMax != 0 and moistureMin != 0:
 								mst = sensors.soilMoisture(moistureMin, moistureMax, float(mst))						
-							dataPoints.append(DataPoint(tStamp, float(tmp), float(hum), float(lux), float(mst)))
+							dataPoints.append(DataPoint(tStamp, float(tmp), float(hum), float(lit), float(mst)))
 						except:
 							pass # error negation
 					else:
