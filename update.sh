@@ -6,6 +6,7 @@ git pull
 
 sudo -u pi psql << EOF
 DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS data_collection;
 EOF
 
 # Copy Python scripts to the virtual environment
