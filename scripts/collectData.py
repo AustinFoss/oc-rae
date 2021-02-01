@@ -86,14 +86,14 @@ try: # Attempt to connect to the local PostgreSQL database
 	cursor.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = 'data_collection');")
 	record = cursor.fetchone()
 	if record == (False,):
-		cursor.execute("CREATE TABLE data_collection(posted BOOLEAN NOT NULL, time_stamp FLOAT, temperature FLOAT, relative_humidity FLOAT, ambient_light FLOAT, soil_moisture FLOAT, plant1Height FLOAT, plant2Height FLOAT, plant3Height FLOAT, plant4Height FLOAT);")
+		cursor.execute("CREATE TABLE data_collection(time_stamp FLOAT, temperature FLOAT, relative_humidity FLOAT, ambient_light FLOAT, soil_moisture FLOAT, plant1Height FLOAT, plant2Height FLOAT, plant3Height FLOAT, plant4Height FLOAT);")
 
 	# Create settings table if none present
 	cursor.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = 'settings');")
 	record = cursor.fetchone()
 	if record == (False,):
 		cursor.execute("CREATE TABLE settings(setting VARCHAR(100), value VARCHAR(100));")
-		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0), ('moistureMax', 0), ('moistureMin', 0), ('lightOffMax', 0), ('lightOnMin', 0), ('plant1Height', 0), ('plant2Height', 0), ('plant3Height', 0), ('plant4Height', 0), ('token', 0), ('postgresql_backup', 0);")
+		cursor.execute("INSERT INTO settings (setting, value) VALUES ('dataCollectionPeriod', 0), ('dataSampleRate', 0), ('moistureMax', 0), ('moistureMin', 0), ('lightOnMin', 0), ('plant1Height', 0), ('plant2Height', 0), ('plant3Height', 0), ('plant4Height', 0), ('token', 0), ('postgresql_backup', 0);")
 	else:
 		checkSettings(connection)
 
@@ -129,7 +129,7 @@ else:
 
 				# Write average data samples for that period to the PostgreSQL database
 				cursor = connection.cursor()
-				cursor.execute("INSERT INTO data_collection values('0', " + time + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lit)/len(lit)) + ", " + str(sum(mst)/len(mst)) + ", " + str(plant1Height) + ", " + str(plant2Height) + ", " + str(plant3Height) + ", " + str(plant4Height) + ");")
+				cursor.execute("INSERT INTO data_collection values(" + time + ", " + str(sum(tmp)/len(tmp)) + ", " + str(sum(hum)/len(hum)) + ", " + str(sum(lit)/len(lit)) + ", " + str(sum(mst)/len(mst)) + ", " + str(plant1Height) + ", " + str(plant2Height) + ", " + str(plant3Height) + ", " + str(plant4Height) + ");")
 				connection.commit()
 				cursor.close()
 
