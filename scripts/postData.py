@@ -7,6 +7,7 @@ import base64
 
 postingServer = 0
 lastPosted = 0
+token = ''
 
 def checkSettings(connection):
     cursor = connection.cursor()
@@ -19,6 +20,15 @@ def checkSettings(connection):
     else:
         global lastPosted
         lastPosted = record[0][1]
+
+    cursor.execute("SELECT * FROM settings WHERE setting = 'token';")
+    record = cursor.fetchall()
+    if len(record) == 0:
+        cursor.execute("INSERT INTO settings (setting, value) VALUES ('token', 0);")
+        connection.commit()
+    else:
+        global token
+        token = record[0][1]
 
     cursor.execute("SELECT * FROM settings WHERE setting = 'postingServer';")
     record = cursor.fetchall()
@@ -64,27 +74,27 @@ else:
                 cursor.close()
 
                 data = {
-                    "time_stamp": round(record[1]),
-                    "temperature_c": record[2],
-                    "relative_humidity": record[3],
-                    "ambient_light": record[4],
-                    "soil_moisture": record[5]                    
+                    "time_stamp": round(record[0]),
+                    "temperature_c": record[1],
+                    "relative_humidity": record[2],
+                    "ambient_light": record[3],
+                    "soil_moisture": record[4]                    
                 }
-                with open("/home/pi/oc-rae/Pictures/" + str(round(record[1])) + ".png", 'rb') as img:
+                with open("/home/pi/oc-rae/Pictures/" + str(round(record[0])) + ".png", 'rb') as img:
                     files = [
-                        ('Token', (None, 'aNewToken')),
+                        ('Token', (None, token)),
                         ('data', (str(round(record[1])) + ".png", img, 'image/png')),
                         ('sensor', (None, json.dumps(data), 'application/json'))    
                     ]                
-                    response = requests.post(postingServer, auth=('Token1', 'student'), files=files)
+                    response = requests.post(postingServer, files=files)
                 
                 if response.status_code != 200:
                     print("Error Posting: Handle Error")
                 else:
-                    print(round(record[1]))
+                    print(round(record[0]))
                     
                     cursor = connection.cursor()
-                    cursor.execute("UPDATE settings SET value = " + str(record[1]) + " WHERE setting = 'lastPosted';")
+                    cursor.execute("UPDATE settings SET value = " + str(record[0]) + " WHERE setting = 'lastPosted';")
                     connection.commit()
                     cursor.close()   
                     
