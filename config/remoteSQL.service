@@ -1,0 +1,11 @@
+[Unit]
+Description=Post Data From Local SQL to Remote Server
+
+[Service]
+# Command to execute when the service is started
+ExecStart=/home/pi/environments/oc-rae/bin/python /home/pi/environments/oc-rae/remoteSQL.py
+Restart=always
+StandardOutput=file:/var/log/remoteSQL
+
+[Install]
+WantedBy=default.target
