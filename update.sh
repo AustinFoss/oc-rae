@@ -37,7 +37,7 @@ chown root:root /etc/systemd/system/collectData.service
 chmod 644 /etc/systemd/system/collectData.service
 chown root:root /etc/systemd/system/postData.service
 chmod 644 /etc/systemd/system/postData.service
-chown root:root /etc/systemd/system/remoteSQL.servie
+chown root:root /etc/systemd/system/remoteSQL.service
 chmod 644 /etc/systemd/system/remoteSQL.service
 
 systemctl daemon-reload
