@@ -2,12 +2,12 @@
 
 systemctl stop collectData.service
 
-#git pull
+git pull
 
-#sudo -u pi psql << EOF
-#DROP TABLE IF EXISTS settings;
-#DROP TABLE IF EXISTS data_collection;
-#EOF
+sudo -u pi psql << EOF
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS data_collection;
+EOF
 
 # Copy Python scripts to the virtual environment
 cp -r /home/pi/oc-rae/scripts/* /home/pi/environments/oc-rae/
