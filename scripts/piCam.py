@@ -16,7 +16,7 @@ def snapPhoto(name):
         sleep(2) # Camera warm-up time and sensor exposure
 
         # Save the image to the Pictures folder on the raspberry pi zero
-        camera.capture('/home/pi/oc-rae/Pictures/' + name + '.png')
+        camera.capture('/home/pi/oc-rae/Pictures/' + name + '.jpg')
     finally:
         # Stop the camera
         camera.close()

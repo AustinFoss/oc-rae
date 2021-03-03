@@ -80,10 +80,10 @@ else:
                     "ambient_light": record[3],
                     "soil_moisture": record[4]                    
                 }
-                with open("/home/pi/oc-rae/Pictures/" + str(round(record[0])) + ".png", 'rb') as img:
+                with open("/home/pi/oc-rae/Pictures/" + str(round(record[0])) + ".jpg", 'rb') as img:
                     files = [
                         ('Token', (None, token)),
-                        ('data', (str(round(record[1])) + ".png", img, 'image/png')),
+                        ('data', (str(round(record[1])) + ".jpg", img, 'image/jpg')),
                         ('sensor', (None, json.dumps(data), 'application/json'))    
                     ]                
                     response = requests.post(postingServer, files=files)

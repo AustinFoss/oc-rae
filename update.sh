@@ -2,12 +2,12 @@
 
 systemctl stop collectData.service
 
-git pull
+#git pull
 
-sudo -u pi psql << EOF
-DROP TABLE IF EXISTS settings;
-DROP TABLE IF EXISTS data_collection;
-EOF
+#sudo -u pi psql << EOF
+#DROP TABLE IF EXISTS settings;
+#DROP TABLE IF EXISTS data_collection;
+#EOF
 
 # Copy Python scripts to the virtual environment
 cp -r /home/pi/oc-rae/scripts/* /home/pi/environments/oc-rae/
@@ -37,10 +37,12 @@ chown root:root /etc/systemd/system/collectData.service
 chmod 644 /etc/systemd/system/collectData.service
 chown root:root /etc/systemd/system/postData.service
 chmod 644 /etc/systemd/system/postData.service
-chown root:root /etc/systemd/system/remoteSQL.servie
+chown root:root /etc/systemd/system/remoteSQL.service
 chmod 644 /etc/systemd/system/remoteSQL.service
 
 systemctl daemon-reload
 systemctl enable collectData.service
 systemctl enable postData.service
 systemctl enable remoteSQL.service
+
+reboot
