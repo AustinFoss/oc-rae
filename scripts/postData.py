@@ -80,23 +80,44 @@ else:
                     "ambient_light": record[3],
                     "soil_moisture": record[4]                    
                 }
-                with open("/home/pi/oc-rae/Pictures/" + str(round(record[0])) + ".jpg", 'rb') as img:
-                    files = [
-                        ('Token', (None, token)),
-                        ('data', (str(round(record[1])) + ".jpg", img, 'image/jpg')),
-                        ('sensor', (None, json.dumps(data), 'application/json'))    
-                    ]                
-                    response = requests.post(postingServer, files=files)
-                
-                if response.status_code != 200:
-                    print("Error Posting: Handle Error")
-                else:
-                    print(round(record[0]))
+                try:
+                    with open("/home/pi/oc-rae/Pictures/" + str(round(record[0])) + ".png", 'rb') as img:
+                        files = [
+                            ('Token', (None, token)),
+                            ('data', (str(round(record[1])) + ".png", img, 'image/png')),
+                            ('sensor', (None, json.dumps(data), 'application/json'))    
+                        ]                
+                        response = requests.post(postingServer, files=files)
                     
-                    cursor = connection.cursor()
-                    cursor.execute("UPDATE settings SET value = " + str(record[0]) + " WHERE setting = 'lastPosted';")
-                    connection.commit()
-                    cursor.close()   
+                    if response.status_code != 200:
+                        print("Error Posting: Handle Error")
+                    else:
+                        print(round(record[0]))
+                        
+                        cursor = connection.cursor()
+                        cursor.execute("UPDATE settings SET value = " + str(record[0]) + " WHERE setting = 'lastPosted';")
+                        connection.commit()
+                        cursor.close()   
+
+                except Exception: 
+
+                    with open("/home/pi/oc-rae/Pictures/" + str(round(record[0])) + ".jpg", 'rb') as img:
+                        files = [
+                            ('Token', (None, token)),
+                            ('data', (str(round(record[1])) + ".jpg", img, 'image/jpg')),
+                            ('sensor', (None, json.dumps(data), 'application/json'))    
+                        ]                
+                        response = requests.post(postingServer, files=files)
+                    
+                    if response.status_code != 200:
+                        print("Error Posting: Handle Error")
+                    else:
+                        print(round(record[0]))
+                        
+                        cursor = connection.cursor()
+                        cursor.execute("UPDATE settings SET value = " + str(record[0]) + " WHERE setting = 'lastPosted';")
+                        connection.commit()
+                        cursor.close()   
                     
         time.sleep(1)
         gc.collect()

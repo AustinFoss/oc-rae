@@ -13,6 +13,11 @@ chown root:root /etc/systemd/system/remoteSQL.service
 chmod 644 /etc/systemd/system/remoteSQL.service
 
 systemctl daemon-reload
+
+systemctl enable collectData.service
+systemctl enable postData.service
+systemctl enable remoteSQL.service
+
 systemctl restart collectData.service
 systemctl restart postData.service
 systemctl restart remoteSQL.service
